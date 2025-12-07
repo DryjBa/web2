@@ -30,7 +30,7 @@
                                 <label for="image" class="form-label">Выберите изображение</label>
                                 <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png" required>
                                 <div class="form-text">
-                                    Максимальный размер: {{ max_file_size }} МБ. Поддерживаются JPG и PNG.
+                                    Максимальный размер: <span id="maxSizeDisplay">{{ max_file_size }}</span> МБ. Поддерживаются JPG и PNG.
                                 </div>
                             </div>
                             
@@ -161,20 +161,26 @@
         }
         
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', updateColorPreview);
-        
-        // Проверка размера файла перед отправкой
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            const fileInput = document.getElementById('image');
-            const maxSize = {{ max_file_size }} * 1024 * 1024; // Конвертируем в байты
+        document.addEventListener('DOMContentLoaded', function() {
+            updateColorPreview();
             
-            if (fileInput.files.length > 0) {
-                const fileSize = fileInput.files[0].size;
-                if (fileSize > maxSize) {
-                    e.preventDefault();
-                    alert(`Файл слишком большой. Максимальный размер: {{ max_file_size }} МБ`);
+            // Получаем максимальный размер файла из data-атрибута
+            const maxSizeDisplay = document.getElementById('maxSizeDisplay');
+            const maxFileSize = maxSizeDisplay ? parseInt(maxSizeDisplay.textContent) : 5; // По умолчанию 5 МБ
+            
+            // Проверка размера файла перед отправкой
+            document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                const fileInput = document.getElementById('image');
+                const maxSize = maxFileSize * 1024 * 1024; // Конвертируем в байты
+                
+                if (fileInput.files.length > 0) {
+                    const fileSize = fileInput.files[0].size;
+                    if (fileSize > maxSize) {
+                        e.preventDefault();
+                        alert(`Файл слишком большой. Максимальный размер: ${maxFileSize} МБ`);
+                    }
                 }
-            }
+            });
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
